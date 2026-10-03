@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>🔮 Глубинный тест Веды: Какой Артефакт зовёт тебя по имени?</title>
+<style>
+:root{
+  --bg1:#0c0716;
+  --bg2:#170d29;
+  --gold:#e8c47a;
+  --gold-deep:#c98f4e;
+  --gold-soft:rgba(232,196,122,.35);
+  --ink:#efe7f7;
+  --muted:#b3a6cc;
+  --soft:#ded4ee;
+  --card:rgba(255,255,255,.045);
+  --line:rgba(232,196,122,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:Georgia,'Times New Roman',serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1100px 700px at 85% -10%, rgba(122,62,205,.24), transparent 60%),
+    radial-gradient(800px 550px at -10% 35%, rgba(255,150,60,.10), transparent 55%),
+    linear-gradient(160deg, var(--bg2), var(--bg1) 60%);
+  background-attachment:fixed;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* ── звёзды ─────────────────────────────── */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 18%, rgba(255,255,255,.75), transparent 100%),
+    radial-gradient(1.2px 1.2px at 28% 62%, rgba(255,255,255,.5), transparent 100%),
+    radial-gradient(1.8px 1.8px at 44% 30%, rgba(232,196,122,.8), transparent 100%),
+    radial-gradient(1.2px 1.2px at 63% 74%, rgba(255,255,255,.45), transparent 100%),
+    radial-gradient(1.6px 1.6px at 78% 22%, rgba(255,255,255,.6), transparent 100%),
+    radial-gradient(1.2px 1.2px at 88% 58%, rgba(232,196,122,.6), transparent 100%),
+    radial-gradient(1.4px 1.4px at 8% 84%, rgba(255,255,255,.5), transparent 100%),
+    radial-gradient(1.3px 1.3px at 52% 90%, rgba(255,255,255,.4), transparent 100%),
+    radial-gradient(1.5px 1.5px at 70% 8%,  rgba(255,255,255,.55), transparent 100%);
+  animation:twinkle 6s ease-in-out infinite alternate;
+}
+.stars.b{
+  background-image:
+    radial-gradient(1.1px 1.1px at 18% 42%, rgba(255,255,255,.4), transparent 100%),
+    radial-gradient(1.4px 1.4px at 36% 12%, rgba(255,255,255,.5), transparent 100%),
+    radial-gradient(1.1px 1.1px at 58% 50%, rgba(232,196,122,.5), transparent 100%),
+    radial-gradient(1.5px 1.5px at 82% 82%, rgba(255,255,255,.45), transparent 100%),
+    radial-gradient(1.1px 1.1px at 94% 34%, rgba(255,255,255,.4), transparent 100%),
+    radial-gradient(1.3px 1.3px at 6% 30%, rgba(255,255,255,.45), transparent 100%);
+  animation:twinkle 9s ease-in-out infinite alternate-reverse;
+}
+@keyframes twinkle{from{opacity:.45}to{opacity:1}}
+
+main{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:34px 18px 90px}
+.screen{display:none}
+.screen.active{display:block;animation:screenIn .6s ease both}
+@keyframes screenIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:30px 26px;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+}
+
+/* ── интро ─────────────────────────────── */
+.intro-emoji{font-size:64px;text-align:center;line-height:1;
+  animation:float 4.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 26px rgba(255,180,80,.55));}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.kicker{text-align:center;color:var(--gold);letter-spacing:.22em;text-transform:uppercase;font-size:12.5px;margin-top:18px}
+.title{
+  font-size:33px;line-height:1.22;text-align:center;margin:12px auto 6px;max-width:14em;
+  background:linear-gradient(120deg,#f7e3b0 10%,#e8c47a 45%,#c98f4e 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.subtitle{text-align:center;color:var(--muted);font-style:italic;font-size:17px;margin-top:4px}
+.divider{text-align:center;color:var(--gold-soft);letter-spacing:1em;margin:20px 0 6px;font-size:12px}
+.intro-text p{margin:14px 0;line-height:1.68;color:var(--soft);font-size:16.5px}
+.intro-text b{color:var(--ink)}
+.btn-primary{
+  display:block;width:100%;margin-top:26px;padding:17px 20px;
+  font:inherit;font-size:18px;font-weight:700;color:#241338;
+  background:linear-gradient(120deg,#f2d9a4,#e0b46a);
+  border:none;border-radius:15px;cursor:pointer;
+  box-shadow:0 8px 30px rgba(224,180,106,.35);
+  transition:transform .25s,box-shadow .25s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 42px rgba(224,180,106,.5)}
+.btn-primary:active{transform:translateY(0)}
+.btn-ghost{
+  display:inline-block;margin-top:22px;padding:13px 22px;
+  font:inherit;font-size:15.5px;color:var(--gold);
+  background:transparent;border:1px solid var(--gold-soft);border-radius:13px;cursor:pointer;
+  transition:background .25s,transform .25s;
+}
+.btn-ghost:hover{background:rgba(232,196,122,.1);transform:translateY(-1px)}
+.hint{margin-top:14px;text-align:center;color:var(--muted);font-size:13.5px;font-style:italic;line-height:1.55}
+
+/* ── вопросы ───────────────────────────── */
+.quiz-head{display:flex;align-items:center;gap:12px}
+.icon-btn{
+  flex:0 0 auto;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--gold-soft);background:rgba(232,196,122,.07);
+  color:var(--gold);font-size:17px;cursor:pointer;transition:.25s;line-height:1;
+}
+.icon-btn:hover{background:rgba(232,196,122,.16)}
+.icon-btn[disabled]{opacity:.25;cursor:default}
+.quiz-meta{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+#qNum{color:var(--muted);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase}
+#qLine{color:var(--gold);font-size:16.5px;font-weight:700}
+.candle{flex:0 0 auto;font-size:20px;animation:flicker 2.4s ease-in-out infinite}
+@keyframes flicker{0%,100%{opacity:.8;transform:scale(1)}50%{opacity:1;transform:scale(1.1) translateY(-1px)}}
+.progress{height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin:16px 0 24px}
+#progressFill{height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,#f2d9a4,#e0b46a);
+  box-shadow:0 0 12px rgba(232,196,122,.7);
+  transition:width .55s cubic-bezier(.4,0,.2,1)}
+.anim{animation:screenIn .5s ease both}
+.q-emoji{font-size:42px;line-height:1;text-align:center;margin-bottom:12px;
+  filter:drop-shadow(0 0 18px rgba(255,180,80,.45));}
+.q-prompt{font-style:italic;color:var(--muted);text-align:center;margin:0 auto 22px;line-height:1.6;font-size:16.5px;max-width:26em}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{
+  display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
+  font:inherit;font-size:15.5px;line-height:1.58;color:var(--ink);
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(232,196,122,.16);border-radius:15px;
+  padding:14px 15px;cursor:pointer;
+  transition:transform .2s,border-color .2s,background .2s,box-shadow .2s;
+}
+.opt:hover{border-color:var(--gold-soft);background:rgba(232,196,122,.08);transform:translateX(5px)}
+.opt .badge{
+  flex:0 0 auto;width:30px;height:30px;border-radius:50%;margin-top:2px;
+  display:grid;place-items:center;font-weight:700;font-size:14px;
+  color:var(--gold);border:1px solid var(--gold-soft);background:rgba(232,196,122,.08);
+  transition:.25s;font-family:Georgia,serif;
+}
+.opt.italic{font-style:italic}
+.opt.italic .badge{opacity:.85}
+.opt.chosen{
+  border-color:var(--gold);
+  background:linear-gradient(120deg,rgba(232,196,122,.24),rgba(232,196,122,.07));
+  box-shadow:0 0 26px rgba(232,196,122,.28);
+}
+.opt.chosen .badge{background:var(--gold);color:#241338;border-color:var(--gold)}
+.skip-wrap{margin-top:20px;text-align:center}
+.skip-btn{
+  font:inherit;font-size:14px;color:var(--muted);
+  background:transparent;border:1px dashed rgba(179,166,204,.4);
+  border-radius:99px;padding:10px 22px;cursor:pointer;
+  transition:.25s;
+}
+.skip-btn:hover{color:var(--gold);border-color:var(--gold-soft);background:rgba(232,196,122,.06)}
+.skip-btn.chosen{color:var(--gold);border-color:var(--gold);background:rgba(232,196,122,.12);box-shadow:0 0 18px rgba(232,196,122,.2)}
+
+/* ── результат ─────────────────────────── */
+.tally{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 6px}
+.chip{
+  padding:8px 15px;border-radius:99px;font-size:14px;
+  border:1px solid rgba(232,196,122,.18);color:var(--muted);
+  background:rgba(255,255,255,.03);transition:.3s;
+}
+.chip.top{
+  border-color:var(--gold);color:var(--gold);
+  background:rgba(232,196,122,.1);
+  box-shadow:0 0 16px rgba(232,196,122,.22);
+}
+.verdict{margin:18px 0 4px}
+.verdict p{line-height:1.65;color:var(--soft);font-size:16px;margin:6px 0}
+.verdict b{color:var(--gold);font-size:17px}
+.result-card{
+  background:var(--card);border:1px solid var(--line);border-radius:22px;
+  padding:28px 24px;margin-top:18px;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+  opacity:0;animation:cardIn .7s ease forwards;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.985)}to{opacity:1;transform:none}}
+.result-head{display:flex;align-items:center;gap:15px}
+.result-icon{font-size:46px;line-height:1;filter:drop-shadow(0 0 20px rgba(255,180,80,.5));animation:float 4.5s ease-in-out infinite}
+.result-line{color:var(--gold);font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px}
+.result-h{font-size:25px;line-height:1.2}
+.result-desc{margin:16px 0;line-height:1.72;color:var(--soft);font-size:16px}
+.artifact{
+  background:rgba(232,196,122,.07);
+  border:1px solid rgba(232,196,122,.28);
+  border-radius:16px;padding:17px 17px 15px;margin:14px 0;
+}
+.artifact .tag{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.artifact h4{font-size:19.5px;margin:7px 0 5px;color:var(--ink)}
+.artifact p{line-height:1.66;color:var(--soft);font-size:15px}
+.nuance{
+  background:rgba(255,120,110,.06);
+  border:1px dashed rgba(255,170,140,.4);
+  border-radius:16px;padding:16px 17px;margin-top:15px;
+  font-size:14.5px;line-height:1.68;color:#e8d9e0;
+}
+.nuance b{color:#f0b9a4}
+/* финал */
+.final{margin-top:26px}
+.final-title{font-size:22px;text-align:center;margin-bottom:14px;color:var(--ink)}
+.final p{line-height:1.7;color:var(--soft);font-size:15.5px;margin:12px 0}
+.final .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 6px}
+.cta{
+  flex:1 1 250px;text-align:center;padding:16px 18px;border-radius:15px;
+  font:inherit;font-size:16px;font-weight:700;text-decoration:none;
+  transition:transform .25s,box-shadow .25s,background .25s;
+}
+.cta.gold{background:linear-gradient(120deg,#f2d9a4,#e0b46a);color:#241338;box-shadow:0 8px 28px rgba(224,180,106,.35)}
+.cta.ghost{border:1px solid var(--gold-soft);color:var(--gold);background:rgba(232,196,122,.05)}
+.cta:hover{transform:translateY(-2px)}
+.cta.gold:hover{box-shadow:0 12px 38px rgba(224,180,106,.5)}
+.cta.ghost:hover{background:rgba(232,196,122,.12)}
+.link-overlay{
+  position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;
+  background:rgba(8,4,16,.8);backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);animation:screenIn .3s ease both;
+}
+.link-box{max-width:470px;text-align:center}
+.link-title{font-size:17.5px;line-height:1.6;color:var(--ink);margin-top:12px}
+.link-sub{color:var(--muted);font-size:14.5px;margin-top:8px;line-height:1.55}
+.link-url{
+  display:block;margin:14px 0;padding:12px 14px;border-radius:12px;
+  background:rgba(0,0,0,.35);border:1px solid var(--line);
+  color:var(--gold);font-size:12.5px;word-break:break-all;line-height:1.5;
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+}
+#closeOverlayBtn{margin-top:12px}
+.share-line{
+  border-top:1px dashed var(--line);margin-top:18px;padding-top:16px;
+  font-style:italic;color:var(--muted);line-height:1.65;font-size:15px;
+}
+.signature{text-align:center;margin-top:20px;line-height:1.7;font-size:16px;color:var(--soft);font-style:italic}
+.signature b{color:var(--gold);font-style:normal;font-size:18px}
+@media (max-width:480px){
+  .title{font-size:28px}
+  .card{padding:24px 18px}
+  main{padding:24px 12px 70px}
+}
+</style>
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+<div class="stars b" aria-hidden="true"></div>
+
+<main>
+
+  <!-- ══════════ ИНТРО ══════════ -->
+  <section id="screen-intro" class="screen active">
+    <div class="card">
+      <div class="intro-emoji">🔮</div>
+      <p class="kicker">Глубинный тест Веды</p>
+      <h1 class="title">Какой Артефакт зовёт тебя по имени?</h1>
+      <p class="subtitle">8 вопросов-зеркал · 5 линий · 1 Артефакт</p>
+      <div class="divider">✦ ✦ ✦</div>
+      <div class="intro-text">
+        <p>Дорогая душа, ты здесь не случайно.</p>
+        <p>Я — <b>Веда</b>. И прежде чем взять в руки карты Таро, я всегда смотрю: а что сейчас происходит в поле человека? Где трещина? Где утечка? Где та самая точка, в которую нужно поставить точный, живой инструмент — и всё начнёт меняться.</p>
+        <p>Этот тест я собрала не для развлечения. Это <b>8 вопросов-зеркал</b>, которые смотрят на тебя со всех сторон: тело, эмоции, дом, деньги, дух, отношения, подсознание, стихии. <b>Не думай головой.</b> Отвечай тем, что первое всплывает в груди.</p>
+        <p>В конце ты узнаешь свой <b>главный Артефакт</b> и <b>спутника</b>, который усилит его в разы.</p>
+      </div>
+      <button class="btn-primary" id="startBtn">🕯️ Начать тест</button>
+      <p class="hint">Займёт 2–3 минуты · Букву записывать не нужно — я посчитаю сама</p>
+    </div>
+  </section>
+
+  <!-- ══════════ ВОПРОСЫ ══════════ -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-head">
+      <button id="backBtn" class="icon-btn" title="Назад" disabled>←</button>
+      <div class="quiz-meta">
+        <span id="qNum"></span>
+        <span id="qLine"></span>
+      </div>
+      <span class="candle" aria-hidden="true">🕯️</span>
+    </div>
+    <div class="progress"><div id="progressFill"></div></div>
+    <div class="card"><div id="quizBody"></div></div>
+  </section>
+
+  <!-- ══════════ РЕЗУЛЬТАТ ══════════ -->
+  <section id="screen-result" class="screen">
+    <div id="resultBody"></div>
+  </section>
+
+</main>
+
+<script>
+'use strict';
+
+/* ───────── данные ───────── */
+var LETTERS = ['А','Б','В','Г','Д'];
+var KEYS = ['a','b','v','g','d'];
+
+var QUESTIONS = [
+  {emoji:'🧍‍♀️', title:'Тело', prompt:'Закрой глаза. Где в теле сейчас живёт напряжение?', options:[
+    'В плечах и челюсти — как будто я постоянно держу оборону, жду удара.',
+    'В животе и солнечном сплетении — тревога за стабильность, за «а хватит ли мне?».',
+    'В груди, в горле — ком, сдавленность, невысказанная боль.',
+    'Во всём теле — ватная тяжесть, будто меня выключили из розетки.',
+    'В голове — бесконечный поток мыслей, не могу остановиться, не чувствую почвы под ногами.'
+  ]},
+  {emoji:'💫', title:'Эмоция', prompt:'Что ты чувствуешь чаще всего в последнюю неделю?', options:[
+    'Раздражение и подозрительность. Мне кажется, кто-то лезет в мою жизнь, нарушает границы, смотрит косо.',
+    'Фрустрацию. Я стараюсь, но результата нет. Деньги не приходят, дела стоят, как в болоте.',
+    'Тоску и пустоту. Сердце ноет. Я скучаю, жду, не могу отпустить. Или не могу впустить.',
+    'Апатию. Мне всё равно. Я не хочу ничего. Утро начинается с «зачем».',
+    'Тревогу за близких. Я постоянно думаю: а всё ли в порядке дома? А вдруг что-то случится?'
+  ]},
+  {emoji:'🌙', title:'Сон', prompt:'Что тебе снится в последнее время? (Или что бы хотелось увидеть во сне?)', options:[
+    'Тёмные коридоры, погоня, ощущение, что за мной следят. Или наоборот — я стою в свете и никто не может ко мне подойти.',
+    'Я нахожу деньги, открываю двери, вижу бесконечные дороги и возможности.',
+    'Вода. Океан, дождь, слёзы. Или чьё-то лицо рядом. Или пустая комната, где раньше кто-то был.',
+    'Огонь. Костёр, солнце, искры. Или я бегу, лечу, чувствую скорость и ветер.',
+    'Дом. Старый, родной. Или я строю стены, зажигаю свечи, накрываю стол для тех, кого люблю.'
+  ]},
+  {emoji:'🌿', title:'Стихия', prompt:'Представь, что ты можешь прямо сейчас оказаться в одном месте. Где ты?', options:[
+    'В густом лесу, среди деревьев, где меня никто не видит и не найдёт. Тишина и укрытие.',
+    'На вершине горы, откуда видно весь мир. Ветер, простор, ощущение «я могу всё».',
+    'У воды. Река, море, водопад. Я сижу на берегу и слушаю.',
+    'У костра. Жар, треск дров, искры летят вверх. Я чувствую тепло и силу.',
+    'В уютной комнате. Плед, чай, свечи, запах трав. Безопасность и мягкость.'
+  ]},
+  {emoji:'💬', title:'Отношения с миром', prompt:'Как ты сейчас взаимодействуешь с людьми?', options:[
+    'Я закрылась. Не хочу ни с кем общаться. Боюсь, что меня сглазят, обесценят, используют.',
+    'Я хочу контактов, но они не работают. Клиенты не приходят, партнёры сливаются, деньги не задерживаются.',
+    'Я тянусь к одному человеку (или хочу тянуться), но между нами стена. Или я боюсь снова открыться.',
+    'Я отдаю слишком много. Все чего-то хотят от меня, а мне не остаётся ничего. Я пуста.',
+    'Я тревожусь за тех, кого люблю. Хочу, чтобы у них всё было хорошо, и готова отдать последнее.'
+  ]},
+  {emoji:'🔑', title:'Подсознание', prompt:'Если бы я дала тебе одну фразу-ключ, какая бы откликнулась прямо сейчас?', phrase:true, options:[
+    '«Никто больше не войдёт без моего разрешения.»',
+    '«Я открываю шлюзы. Поток идёт ко мне.»',
+    '«Моё сердце имеет право на тепло.»',
+    '«Я разрешаю себе жить. Я встаю и иду.»',
+    '«Мой дом — моя крепость. Мой род — моя сила.»'
+  ]},
+  {emoji:'🕯️', title:'Предмет', prompt:'Перед тобой на столе лежат 5 предметов. К какому тянется рука?', options:[
+    'Зеркало, повёрнутое отражением к тебе.',
+    'Старинная монета, тёплая на ощупь.',
+    'Красный камень, гладкий, как капля.',
+    'Обгоревшая спичка, от которой ещё идёт тонкий дымок.',
+    'Пучок сухих трав, перевязанный ниткой.'
+  ]},
+  {emoji:'🌅', title:'Действие', prompt:'Представь: завтра ты проснулась, и всё стало хорошо. Что ты делаешь первым делом?', options:[
+    'Выдыхаю. Снимаю броню. Впервые за долгое время чувствую, что мне не нужно защищаться.',
+    'Иду в дело. Открываю ноутбук, звоню, создаю. У меня есть ресурс и ясность.',
+    'Обнимаю. Или пишу. Или просто сижу рядом с тем, кто мне дорог. И мне не больно.',
+    'Встаю рано. Иду гулять. Чувствую тело, воздух, скорость. Я живая.',
+    'Готовлю. Накрываю стол. Зажигаю свечу. Собираю своих. Нам хорошо вместе.'
+  ]}
+];
+
+var RESULTS = {
+  a:{
+    icon:'🛡️', line:'Линия Защиты', headline:'Щит от Тьмы',
+    desc:'Ты устала держать оборону. Твоё поле пробито чужими взглядами, словами, завистью. Ты чувствуешь это телом: плечи каменные, челюсть сжата, сон поверхностный. Ты не параноик — ты просто слишком долго была без защиты.',
+    artifact:{name:'Амулет-Обратник',
+      text:'Это энергетическое зеркало, заряженное четырьмя стихиями. Он не просто ставит стену — он разворачивает негатив обратно к отправителю. Ты перестаёшь быть мишенью. Ты становишься зеркалом.'},
+    companion:{name:'Ведьмин узел',
+      text:'Обратник защищает снаружи. А Ведьмин узел работает изнутри — он не даёт твоему собственному свету вытекать через те самые пробоины. Ты перестаёшь отдавать энергию тем, кто её не заслуживает.'},
+    nuance:'Обратник настраивается на одного владельца. Его нельзя давать мерить, трогать чужими руками, «показать подруге». Это твой личный щит. Если хочешь глубже — бери <b>Кольцо Ægishjálmur</b> (Шлем Ужаса). Оно даёт круговую защиту 360° и создаётся под заказ с вшиванием твоего рунического имени.'
+  },
+  b:{
+    icon:'🧲', line:'Линия Денег и Потока', headline:'Магнит Изобилия',
+    desc:'У тебя не «плохая карма». У тебя закрыт шлюз. Деньги, клиенты, возможности — всё это есть вокруг, но к тебе не доходит. Ты бьёшься в стекло, а дверь рядом. Просто ты её не видишь.',
+    artifact:{name:'Денежный Магнит',
+      text:'Заряженная латунная монета, которая открывает канал приёма. Она не «притягивает деньги с неба» — она убирает внутренний блок, из-за которого ты сама отталкиваешь поток.'},
+    companion:{name:'Брелок «Узел удачи»',
+      text:'Повесь на ключи. Он работает в фоновом режиме весь день: отсекает мелкие неудачи, «случайные» отказы, досадные накладки. Пока Магнит открывает глобальный канал, Узел расчищает дорогу по мелочам.'},
+    nuance:'Денежный Магнит <b>НЕ работает для пассивных</b>. Он даёт волну — а ты должна в неё войти. Если у тебя свой бизнес или ты ищешь «своих» людей — смотри на <b>Рунический браслет «Клиентская база»</b>. Но! Я делаю его лимитированно — не более 7 штук за цикл. Он работает через сарафанное радио, а не через таргет. Записывайся заранее.'
+  },
+  v:{
+    icon:'🌹', line:'Линия Сердца · Линия Любви', headline:'Алхимия Сердца',
+    desc:'Твоё сердце не разбито. Оно заморожено. Или заперто. Или в нём живёт чужая боль, которую ты носишь как свою. Тебе не нужен «приворот». Тебе нужно разморозить себя и вспомнить: ты достойна тепла.',
+    artifact:{name:'Любовная трансформация',
+      text:'Авторский браслет с формулой, которая исцеляет сердечную чакру. Он не «притягивает конкретного человека». Он делает тебя целостной — и тогда нужные люди сами тянутся.'},
+    companion:{name:'Талисман Венеры',
+      text:'Венера — не про «красивую картинку». Она про право быть желанной, про мягкость, про умение принимать. Талисман Венеры гармонизирует пространство вокруг тебя: ты становишься магнитом для тепла, а не для драмы.'},
+    nuance:'Если ты чувствуешь, что тебе нужен не мягкий, а дерзкий импульс — смотри на <b>Banshi на красном агате</b>. Это усилитель твоего природного магнетизма. Но он не «волшебная таблетка». Он проявляет то, что уже есть внутри. Если внутри страх — сначала работаем со страхом.'
+  },
+  g:{
+    icon:'🔥', line:'Линия Огня и Ресурса', headline:'Исток Силы',
+    desc:'Ты не ленивая. Ты не слабая. Ты выгорела. Твой внутренний огонь тлеет на дне, и тебе нужен кто-то, кто подбросит дров. Не «мотивация из интернета». А настоящий, живой, горячий импульс.',
+    artifact:{name:'Амулет «Рывок Вперёд»',
+      text:'Шунгит или металл с ивритом. Это не «мягкий талисманчик». Это пинок от Вселенной. Он вырывает из болота и говорит: «Вставай. Иди. Ты можешь».'},
+    companion:{name:'Амулет «Батарейка»',
+      text:'Рывок даёт старт. Батарейка держит заряд. Она мягко восстанавливает ресурс к вечеру, возвращает ясность ума, не даёт тебе снова провалиться в «день сурка». Носи их вместе — и ты получишь и искру, и ровное пламя.'},
+    nuance:'Эти инструменты для решительных. Они дают мощную волну. Если ты не готова действовать — не бери. Сначала восстанови базу на консультации. Если хочешь контроль и власть над ситуацией — смотри <b>Огненную Ладонь</b>. Но она требует ответственности.'
+  },
+  d:{
+    icon:'🏮', line:'Линия Дома и Рода', headline:'Хранитель Очага',
+    desc:'Твой дом — не просто стены. Это живое поле. И если в нём ссоры, тревога, холод — ты не можешь восстановить ресурс нигде. Тебе нужно место силы. Настоящее. Тёплое. Защищённое.',
+    artifact:{name:'Куколка-оберег «Мирница»',
+      text:'Она шьётся без узлов и ножниц, на травах Ивана Купала. Ставится на кухню или в гостиную. Мирница не «решает конфликты» — она смягчает поле, делает так, чтобы слова не ранили, а тишина не давила.'},
+    companion:{name:'Табличка «Защита дома» (рунный став)',
+      text:'Мирница работает внутри. Табличка — на пороге. Повесь на видное место у входа. Она ставит периметр: чужая зависть, сплетни, негатив не проходят через дверь.'},
+    nuance:'Если ты чувствуешь, что дому нужна не просто защита, а духовный якорь — смотри <b>Пано «Иисус»</b> (ручная резьба). Но тираж — не более 4 штук. Это эксклюзив. Если хочешь защитить близких, когда они вне дома — бери <b>брелок «Защита дома»</b> или <b>брелок-оберег «Иисус с молитвой»</b>.'
+  }
+};
+
+var THRESHOLD = {
+  icon:'🧭', line:'Порог трансформации', headline:'Ты на пороге',
+  desc:'Ты не в кризисе. Ты в переходе. Старое уже не работает, новое ещё не родилось. Тебе нужен не «инструмент для конкретной проблемы», а проводник, который поможет увидеть путь.',
+  artifact:{name:'Тайный код Калиостро',
+    text:'Это «маячок» для Вселенной. Он не решает одну задачу — он настраивает тебя на твою истинную частоту. Ты начинаешь видеть знаки, принимать верные решения, чувствовать, куда идти.'},
+  companion:{name:'Древо Жизни из шунгита',
+    text:'Шунгит — камень, которому 2 миллиарда лет. Он фильтрует чужие излучения, очищает пространство, заземляет. Пока Код показывает направление, Древо держит тебя в теле и не даёт «улететь» в тревогу.'},
+  nuance:null
+};
+
+var LINK_WRITE = 'https://max.ru/u/f9LHodD0cOLDJfHfiy6Xm2HHjjnxGsoU-XObuQPhdGaVGiMR8p4Z5wS2D-k';
+var LINK_SHOP  = 'https://max.ru/se14366354_bot';
+
+/* ───────── состояние ───────── */
+var state = { step:0, answers:[null,null,null,null,null,null,null,null], busy:false };
+
+function $(id){ return document.getElementById(id); }
+function show(name){
+  ['intro','quiz','result'].forEach(function(s){
+    $('screen-'+s).classList.toggle('active', s===name);
+  });
+  window.scrollTo(0,0);
+}
+
+/* ───────── вопросы ───────── */
+function renderQuestion(){
+  var q = QUESTIONS[state.step];
+  $('qNum').textContent = 'Вопрос ' + (state.step+1) + ' из ' + QUESTIONS.length;
+  $('qLine').textContent = q.title;
+  $('progressFill').style.width = (state.step / QUESTIONS.length * 100) + '%';
+  $('backBtn').disabled = state.step === 0;
+
+  var html = '<div class="q-emoji" aria-hidden="true">' + q.emoji + '</div>' +
+             '<p class="q-prompt">' + q.prompt + '</p><div class="options">';
+  for (var i=0;i<q.options.length;i++){
+    html += '<button class="opt' + (q.phrase?' italic':'') + '" data-k="' + KEYS[i] + '" data-i="' + i + '">' +
+            '<span class="badge">' + LETTERS[i] + '</span><span>' + q.options[i] + '</span></button>';
+  }
+  html += '</div>' +
+         '<div class="skip-wrap"><button class="skip-btn" id="skipBtn" type="button">🕊️ Пропустить — ни один ответ не откликается</button></div>';
+  var body = $('quizBody');
+  body.innerHTML = html;
+  body.classList.remove('anim');
+  void body.offsetWidth;
+  body.classList.add('anim');
+
+  Array.prototype.forEach.call(body.querySelectorAll('.opt'), function(btn){
+    btn.addEventListener('click', function(){ pick(btn.dataset.k, btn); });
+  });
+  body.querySelector('#skipBtn').addEventListener('click', skip);
+}
+
+function advance(delay){
+  setTimeout(function(){
+    state.busy = false;
+    state.step++;
+    if (state.step < QUESTIONS.length){
+      renderQuestion();
+    } else {
+      $('progressFill').style.width = '100%';
+      showResult();
+    }
+  }, delay);
+}
+
+function pick(key, btn){
+  if (state.busy) return;
+  state.busy = true;
+  state.answers[state.step] = key;
+  btn.classList.add('chosen');
+  advance(480);
+}
+
+function skip(){
+  if (state.busy) return;
+  state.busy = true;
+  state.answers[state.step] = null;
+  $('skipBtn').classList.add('chosen');
+  advance(340);
+}
+
+/* ───────── подсчёт ───────── */
+function compute(){
+  var counts = {a:0,b:0,v:0,g:0,d:0};
+  state.answers.forEach(function(k){ counts[k]++; });
+  var max = 0;
+  KEYS.forEach(function(k){ if (counts[k] > max) max = counts[k]; });
+  var top = [];
+  KEYS.forEach(function(k){ if (counts[k] === max) top.push(k); });
+  return {counts:counts, max:max, top:top};
+}
+
+function letterOf(key){ return LETTERS[KEYS.indexOf(key)]; }
+
+/* ───────── результат ───────── */
+function cardHtml(obj, delay){
+  var nuance = obj.nuance
+    ? '<div class="nuance"><b>⚠️ Нюанс от Веды:</b> ' + obj.nuance + '</div>'
+    : '';
+  return '<article class="result-card" style="animation-delay:' + delay + 's">' +
+    '<div class="result-head">' +
+      '<div class="result-icon">' + obj.icon + '</div>' +
+      '<div><div class="result-line">' + obj.line + '</div>' +
+      '<h2 class="result-h">' + obj.headline + '</h2></div>' +
+    '</div>' +
+    '<p class="result-desc">' + obj.desc + '</p>' +
+    '<div class="artifact"><div class="tag">👑 Твой главный Артефакт</div>' +
+      '<h4>' + obj.artifact.name + '</h4><p>' + obj.artifact.text + '</p></div>' +
+    '<div class="artifact"><div class="tag">💡 Спутник</div>' +
+      '<h4>' + obj.companion.name + '</h4><p>' + obj.companion.text + '</p></div>' +
+    nuance +
+  '</article>';
+}
+
+function finalHtml(){
+  return '<div class="card final">' +
+    '<h3 class="final-title">🕯️ Финальное слово от Веды</h3>' +
+    '<p>Дорогая моя. Артефакт — это не «купил и забыл». Это живое соглашение между тобой и силой. Многие из моих инструментов требуют активации, привязки к имени, зарядки в определённые фазы Луны. Я не продаю «красивые штуки». Я передаю ключи.</p>' +
+    '<p>И если ты сейчас читаешь и чувствуешь: <i>«Да, это про меня»</i> — значит, ты готова.</p>' +
+    '<p>📩 Напиши мне в Директ или в Телеграм слово <b>«АРТЕФАКТ»</b>, и я проведу для тебя короткую диагностику: посмотрю на картах, нет ли родовых блоков, которые не пустят энергию инструмента, и подберу точную активацию под тебя.</p>' +
+    '<p>А если ты пока просто читаешь и не уверена — <b>подпишись</b>. Я каждый день делюсь раскладами, советами и знаниями, которые не гуглятся. Здесь нет воды. Здесь только то, что работает.</p>' +
+    '<div class="cta-row">' +
+      '<a class="cta gold" href="' + LINK_WRITE + '" target="_blank" rel="noopener">📩 Написать «АРТЕФАКТ»</a>' +
+      '<a class="cta ghost" href="' + LINK_SHOP + '" target="_blank" rel="noopener">🛍️ Посмотреть в магазине</a>' +
+    '</div>' +
+    '<p class="share-line">Перешли этот тест той подруге, которая давно молчит в трубку, но ты знаешь: ей тяжело. Может, именно сегодня ей нужен её Артефакт. 💌</p>' +
+    '<div class="signature">С теплом, с верой в тебя и с огнём в ладонях,<br><b>Твоя Веда</b> 🌙🔥</div>' +
+    '<p class="hint">А какой результат выпал тебе? Напиши букву в комментариях — я дам короткую подсказку, с чего начать. 👇</p>' +
+    '<div style="text-align:center"><button class="btn-ghost" id="restartBtn">🔁 Пройти ещё раз</button></div>' +
+  '</div>';
+}
+
+function showResult(){
+  var r = compute();
+  var answered = 0;
+  state.answers.forEach(function(a){ if (a !== null) answered++; });
+  var html = '<div class="card"><div class="q-emoji" aria-hidden="true">🗝️</div>' +
+    '<h2 class="subtitle" style="font-style:normal;text-align:center;margin:0 auto 6px">Твой подсчёт</h2>';
+
+  html += '<div class="tally">';
+  KEYS.forEach(function(k){
+    html += '<span class="chip' + (r.max > 0 && r.top.indexOf(k) > -1 ? ' top':'') + '">' +
+            letterOf(k) + ' · ' + r.counts[k] + '</span>';
+  });
+  html += '</div><div class="verdict">';
+
+  if (r.max === 0){
+    html += '<p>Ни одна буква к тебе не откликнулась — и это нормально.</p>' +
+            '<p>Но это и есть знак: ты на пороге трансформации, и тебе нужен проводник. ✨</p>';
+    html += cardHtml(THRESHOLD, .15);
+  } else if (r.top.length === 1){
+    html += '<p>Твой доминирующий отклик — буква <b>' + letterOf(r.top[0]) + '</b> (' +
+            r.max + ' из ' + answered + ' ответ' + (answered === 1 ? 'а' : '') + ').</p>' +
+            '<p>Значит, сейчас самое время услышать свой Артефакт. ✨</p>';
+    html += cardHtml(RESULTS[r.top[0]], .15);
+  } else if (r.top.length === 2){
+    html += '<p>Буквы <b>' + letterOf(r.top[0]) + '</b> и <b>' + letterOf(r.top[1]) +
+            '</b> отозвались с одинаковой силой — по ' + r.max + ' из ' + answered + ' ответ' + (answered === 1 ? 'а' : '') + '.</p>' +
+            '<p>Значит, тебе нужен <b>тандем</b>. Читай оба результата. ✨</p>';
+    html += cardHtml(RESULTS[r.top[0]], .15);
+    html += cardHtml(RESULTS[r.top[1]], .35);
+  } else {
+    html += '<p>Ни одна буква не преобладает над другими.</p>' +
+            '<p>Это значит, что ты на пороге трансформации — и тебе нужен проводник. ✨</p>';
+    html += cardHtml(THRESHOLD, .15);
+  }
+  html += '</div></div>' + finalHtml();
+
+  $('resultBody').innerHTML = html;
+  show('result');
+  $('restartBtn').addEventListener('click', restart);
+  Array.prototype.forEach.call($('resultBody').querySelectorAll('a.cta'), function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      tryOpenExternal(a.getAttribute('href'));
+    });
+  });
+}
+
+function tryOpenExternal(url){
+  var w = null;
+  try { w = window.open(url, '_blank', 'noopener'); } catch(err) { w = null; }
+  if (w) return;
+  showLinkFallback(url);
+}
+
+function showLinkFallback(url){
+  var old = document.querySelector('.link-overlay');
+  if (old) old.remove();
+  var ov = document.createElement('div');
+  ov.className = 'link-overlay';
+  ov.innerHTML =
+    '<div class="link-box card">' +
+      '<div class="q-emoji" aria-hidden="true">🔗</div>' +
+      '<p class="link-title">Открыть ссылку прямо из предпросмотра нельзя — так устроен «песочник».</p>' +
+      '<p class="link-sub">Скопируй ссылку и открой её в своём браузере:</p>' +
+      '<code class="link-url" id="fallbackUrl">' + url + '</code>' +
+      '<button class="btn-primary" id="copyLinkBtn" type="button">📋 Скопировать ссылку</button>' +
+      '<div style="text-align:center"><button class="btn-ghost" id="closeOverlayBtn" type="button">Закрыть</button></div>' +
+    '</div>';
+  document.body.appendChild(ov);
+  var copyBtn = $('copyLinkBtn');
+  var selectUrl = function(){
+    var el = $('fallbackUrl');
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+  copyBtn.addEventListener('click', function(){
+    var done = function(){
+      copyBtn.textContent = '✅ Скопировано!';
+      setTimeout(function(){ copyBtn.textContent = '📋 Скопировать ссылку'; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done, function(){ selectUrl(); done(); });
+    } else {
+      selectUrl();
+      done();
+    }
+  });
+  $('closeOverlayBtn').addEventListener('click', function(){ ov.remove(); });
+  ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
+}
+
+function restart(){
+  state.step = 0;
+  state.answers = [null,null,null,null,null,null,null,null];
+  state.busy = false;
+  startQuiz();
+}
+
+function startQuiz(){
+  renderQuestion();
+  show('quiz');
+}
+
+$('startBtn').addEventListener('click', startQuiz);
+$('backBtn').addEventListener('click', function(){
+  if (state.step > 0 && !state.busy){
+    state.step--;
+    renderQuestion();
+  }
+});
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a44d086baca38eb5',t:'MTc5MTA0MTg5Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
